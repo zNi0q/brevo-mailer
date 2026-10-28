@@ -93,3 +93,12 @@ func TestRenderFooterAndSignOff(t *testing.T) {
 		t.Error("a custom sign-off was ignored")
 	}
 }
+
+func TestRenderHeaderNamesTheBrandWithOrWithoutTheLogo(t *testing.T) {
+	b := brand
+	b.LogoURL = "https://reeplot.com/logo.png"
+	out := b.Render(Content{Title: "t"})
+	if !strings.Contains(out, `alt=""`) || !strings.Contains(out, ">Reeplot</span>") {
+		t.Error("the header should show the mark without alt text and the name as text")
+	}
+}

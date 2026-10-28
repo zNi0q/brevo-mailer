@@ -31,7 +31,7 @@ client, err := mailer.New(mailer.Config{
 brand := mailer.Brand{
 	Name:       "Reeplot",
 	WebsiteURL: "https://reeplot.com",
-	LogoURL:    "https://reeplot.com/email-logo.png", // optional, a square PNG shown at 72px
+	LogoURL:    "https://reeplot.com/email-logo.png", // optional, a square PNG shown at 40px beside the name
 	Accent:     "#111111",                            // the button
 	Address:    "Freetown, Sierra Leone",              // "© Reeplot | Freetown, Sierra Leone"
 	SignOff:    "Thank you,\nThe Reeplot team",        // the default, from Name
@@ -64,7 +64,7 @@ id, err := client.Send(ctx, mailer.Message{
 To send a template you designed in Brevo's own editor instead, give its id:
 `mailer.Message{To: …, TemplateID: 12, Params: map[string]any{"first_name": "Ada"}}`.
 
-The layout is a grey panel with the logo centred on top, a white card holding the
+The layout is a grey panel with the logo and name centred on top, a white card holding the
 greeting, the bold opening line, the paragraphs, a centred uppercase button, a quieter
 notice and the sign-off, then the footer: copyright and address, links, social icons.
 Text is always escaped; the only markup it can carry is `**bold**`, line breaks and

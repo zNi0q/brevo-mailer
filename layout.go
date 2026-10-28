@@ -10,8 +10,8 @@ import (
 // Brand is how every email looks: one layout, your name, logo and colour.
 type Brand struct {
 	Name string
-	// LogoURL is a hosted PNG, shown centred above the card at 72px. Optional; the
-	// name is shown instead.
+	// LogoURL is a hosted square PNG, shown at 40px beside the name, centred above the
+	// card. Optional.
 	LogoURL    string
 	WebsiteURL string
 	// Accent colours the button, as a hex colour. Defaults to near-black.
@@ -120,12 +120,21 @@ func (b Brand) Render(c Content) string {
 	}
 	fmt.Fprintf(&card, `<p style="margin:24px 0 0;font-size:16px;line-height:26px;color:%s">%s</p>`, quiet, rich(signOff))
 
-	head := fmt.Sprintf(`<span style="font-size:22px;font-weight:700;color:%s">%s</span>`, ink, esc(b.Name))
-	if b.LogoURL != "" {
-		head = fmt.Sprintf(`<img src="%s" alt="%s" width="72" height="72" style="display:block;margin:0 auto;border:0;width:72px;height:72px">`, esc(b.LogoURL), esc(b.Name))
+	// The header is the mark and the name side by side, centred. The name is text, so
+	// the header still reads when an inbox blocks images; the mark then has no alt text
+	// to show in its place.
+	link := func(inner string) string {
+		if b.WebsiteURL == "" {
+			return inner
+		}
+		return fmt.Sprintf(`<a href="%s" style="color:%s;text-decoration:none">%s</a>`, esc(b.WebsiteURL), ink, inner)
 	}
-	if b.WebsiteURL != "" {
-		head = fmt.Sprintf(`<a href="%s" style="text-decoration:none">%s</a>`, esc(b.WebsiteURL), head)
+	name := fmt.Sprintf(`<span style="font-size:22px;line-height:40px;font-weight:700;letter-spacing:-.02em;color:%s">%s</span>`, ink, esc(b.Name))
+	head := link(name)
+	if b.LogoURL != "" {
+		mark := fmt.Sprintf(`<img src="%s" alt="" width="40" height="40" style="display:block;border:0;width:40px;height:40px;border-radius:50%%">`, esc(b.LogoURL))
+		head = fmt.Sprintf(`<table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center"><tr><td style="padding-right:10px;vertical-align:middle">%s</td><td style="vertical-align:middle">%s</td></tr></table>`,
+			link(mark), head)
 	}
 
 	var foot strings.Builder
@@ -168,7 +177,7 @@ func (b Brand) Render(c Content) string {
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent">%s</div>
 <table role="presentation" width="100%%" cellspacing="0" cellpadding="0" border="0" style="background:#ffffff"><tr><td align="center" style="padding:32px 12px">
 <table role="presentation" width="100%%" cellspacing="0" cellpadding="0" border="0" style="max-width:640px;background:%s;border-radius:8px">
-<tr><td align="center" style="padding:36px 20px 30px">%s</td></tr>
+<tr><td align="center" style="padding:32px 20px 28px">%s</td></tr>
 <tr><td align="center" style="padding:0 20px">
 <table role="presentation" width="100%%" cellspacing="0" cellpadding="0" border="0" style="max-width:480px;background:#ffffff;border:1px solid %s;border-radius:6px">
 <tr><td style="padding:40px 40px 36px;text-align:left">%s</td></tr>
