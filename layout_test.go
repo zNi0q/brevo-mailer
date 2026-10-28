@@ -56,3 +56,40 @@ func TestPlainText(t *testing.T) {
 		t.Errorf("text version kept the preheader or markup:\n%s", out)
 	}
 }
+
+func TestRenderMarksUpBoldAndEmailsOnly(t *testing.T) {
+	out := brand.Render(Content{
+		Title: "Reset", Greeting: "Hi **Ada**,",
+		Notice: "Not you? Write to help@reeplot.com <b>now</b>",
+	})
+	if !strings.Contains(out, `Hi <strong style="font-weight:700">Ada</strong>,`) {
+		t.Error("the greeting lost its bold name")
+	}
+	if !strings.Contains(out, `href="mailto:help@reeplot.com"`) {
+		t.Error("the email address in the notice was not linked")
+	}
+	if strings.Contains(out, "<b>") {
+		t.Error("markup in the text was not escaped")
+	}
+}
+
+func TestRenderFooterAndSignOff(t *testing.T) {
+	b := brand
+	b.Links = []Link{{Label: "Terms of Use", URL: "https://reeplot.com/legal/terms"}}
+	b.Socials = []Social{{Label: "TikTok", URL: "https://tiktok.com/@reeplot", IconURL: "https://reeplot.com/t.png"}}
+	out := b.Render(Content{Title: "t"})
+	for _, want := range []string{
+		"Thank you,<br>The Reeplot team",
+		"© Reeplot | Freetown, Sierra Leone",
+		`href="https://reeplot.com/legal/terms"`,
+		`alt="TikTok"`,
+	} {
+		if !strings.Contains(out, want) {
+			t.Errorf("render is missing %q", want)
+		}
+	}
+	b.SignOff = "Cheers,\nAda"
+	if !strings.Contains(b.Render(Content{Title: "t"}), "Cheers,<br>Ada") {
+		t.Error("a custom sign-off was ignored")
+	}
+}

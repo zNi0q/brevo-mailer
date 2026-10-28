@@ -31,19 +31,26 @@ client, err := mailer.New(mailer.Config{
 brand := mailer.Brand{
 	Name:       "Reeplot",
 	WebsiteURL: "https://reeplot.com",
-	LogoURL:    "https://reeplot.com/email-logo.png", // optional
-	Accent:     "#E5484D",
-	Address:    "Freetown, Sierra Leone",              // shown in the footer
+	LogoURL:    "https://reeplot.com/email-logo.png", // optional, a square PNG shown at 72px
+	Accent:     "#111111",                            // the button
+	Address:    "Freetown, Sierra Leone",              // "© Reeplot | Freetown, Sierra Leone"
+	SignOff:    "Thank you,\nThe Reeplot team",        // the default, from Name
+	Links: []mailer.Link{
+		{Label: "Terms of Use", URL: "https://reeplot.com/legal/terms"},
+		{Label: "Privacy Policy", URL: "https://reeplot.com/legal/privacy"},
+	},
+	Socials: []mailer.Social{ // optional small icons under the links
+		{Label: "TikTok", URL: "https://tiktok.com/@reeplot", IconURL: "https://reeplot.com/tiktok.png"},
+	},
 }
 
 html := brand.Render(mailer.Content{
 	Preheader:  "Your first video is two minutes away",
-	Eyebrow:    "Welcome",
-	Title:      "Let's make your first video",
-	Greeting:   "Hi Ada,",
+	Greeting:   "Hi **Ada**,",                      // the heading; **stars** make bold
+	Title:      "Let's make your first video",       // the bold opening line
 	Paragraphs: []string{"Drop a clip on the home page and say what you want."},
 	Action:     &mailer.Action{Label: "Make a video", URL: "https://app.reeplot.com"},
-	Notice:     "Didn't sign up? You can ignore this email.",
+	Notice:     "Didn't sign up? Write to support@reeplot.com.", // emails become links
 })
 
 id, err := client.Send(ctx, mailer.Message{
@@ -56,6 +63,12 @@ id, err := client.Send(ctx, mailer.Message{
 
 To send a template you designed in Brevo's own editor instead, give its id:
 `mailer.Message{To: …, TemplateID: 12, Params: map[string]any{"first_name": "Ada"}}`.
+
+The layout is a grey panel with the logo centred on top, a white card holding the
+greeting, the bold opening line, the paragraphs, a centred uppercase button, a quieter
+notice and the sign-off, then the footer: copyright and address, links, social icons.
+Text is always escaped; the only markup it can carry is `**bold**`, line breaks and
+auto-linked email addresses.
 
 ## Templates you edit in an ops dashboard
 
